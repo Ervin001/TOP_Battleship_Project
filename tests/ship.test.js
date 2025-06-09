@@ -1,5 +1,4 @@
-const {} = require('../ship');
-const { Ship } = require('../Ship.1');
+const { Ship } = require('../ship.js');
 
 describe('Ship', () => {
   test('If shipLength is not a number, or a number greater than 0, or sunk is not a boolean, it should throw an error', () => {

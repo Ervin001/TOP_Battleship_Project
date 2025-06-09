@@ -1,3 +1,16 @@
+/**
+ *
+ * @param {number} shipLength - Total number of hits the ship can sustain.
+ * @throws {Error} If shipLength is not a number or less than or equal to 0.
+ * @returns {{
+ *  shipLength: number,
+ *  showHits: () => number,
+ *  isSunk: () => boolean,
+ *  addHit: () => number
+ * }}
+ * @returns
+ */
+
 function Ship(shipLength) {
   let hits = 0;
 
@@ -6,7 +19,7 @@ function Ship(shipLength) {
     throw new Error('Invalid ship length');
   }
 
-  // show num of hits
+  // return ship hits
   function showHits() {
     return hits;
   }
