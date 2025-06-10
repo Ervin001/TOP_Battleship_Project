@@ -13,6 +13,20 @@
 
 function Ship(shipLength) {
   let hits = 0;
+  let direction = 'horizontal'; // default direction
+
+  // get the current direction of the ship
+  function getDirection() {
+    return direction;
+  }
+
+  // change the direction of the ship
+  function changeDirection(dir) {
+    if (dir !== 'horizontal' && dir !== 'vertical') {
+      throw new Error('Invalid direction. Use "horizontal" or "vertical".');
+    }
+    return (direction = dir);
+  }
 
   // validate shipLength
   if (typeof shipLength !== 'number' || shipLength <= 0) {
@@ -34,7 +48,14 @@ function Ship(shipLength) {
     return (hits += 1);
   }
 
-  return { shipLength, showHits, isSunk, addHit };
+  return {
+    shipLength,
+    showHits,
+    isSunk,
+    addHit,
+    getDirection,
+    changeDirection,
+  };
 }
 
 exports.Ship = Ship;

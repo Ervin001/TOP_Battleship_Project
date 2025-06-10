@@ -27,4 +27,17 @@ describe('Ship', () => {
     ship.addHit();
     expect(ship.showHits()).toBe(1);
   });
+
+  test('Ship should have a direction', () => {
+    const ship = Ship(3);
+    expect(ship).toHaveProperty('getDirection');
+  });
+
+  test('Ship should be able to change direction', () => {
+    const ship = Ship(3);
+    ship.changeDirection('vertical');
+    expect(ship.getDirection()).toBe('vertical');
+    ship.changeDirection('horizontal');
+    expect(ship.getDirection()).toBe('horizontal');
+  });
 });
