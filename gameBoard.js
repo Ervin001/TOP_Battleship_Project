@@ -32,6 +32,18 @@ function GameBoard(boardSize = 10) {
     Array(boardSize).fill(null)
   );
 
+  // Get random coordinates on the board
+  function getRandomCoordinates() {
+    const row = Math.floor(Math.random() * boardSize);
+    const col = Math.floor(Math.random() * boardSize);
+    return { row, col };
+  }
+
+  // check if coordinates are available
+  function isCoordinatesAvailable({ row, col }) {
+    return board[row][col] === null;
+  }
+
   // Place boats on the board randomly
 
   function getBoard() {
@@ -40,6 +52,9 @@ function GameBoard(boardSize = 10) {
 
   return {
     getBoard,
+    boats,
+    getRandomCoordinates,
+    isCoordinatesAvailable,
   };
 }
 
