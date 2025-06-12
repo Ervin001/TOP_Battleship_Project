@@ -39,4 +39,12 @@ describe('GameBoard', () => {
     expect(gameBoard.getBoard()[0][3]).toBe(boat);
     expect(gameBoard.getBoard()[0][4]).toBe(boat);
   });
+
+  test('Check if board cannot place a boat out of bounds', () => {
+    const gameBoard = GameBoard(10);
+    const boat = gameBoard.boats[1]; // battle ship
+    const coordinates = { row: 9, col: 9 }; // out of bounds for a 10 x 10 board
+    gameBoard.placeBoat(boat, coordinates, 'horizontal');
+    expect(gameBoard.getBoard()[9][9]).toBeNull(); // The boat should not be placed
+  });
 });
