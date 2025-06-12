@@ -26,8 +26,17 @@ describe('GameBoard', () => {
     expect(gameBoard.isCoordinatesAvailable(randomCoordinates));
   });
 
-  // test('Generate a random available position', () => {
-  //   const gameBoard = GameBoard(10);
-  //   const position =
-  // });
+  test('Check if board can place a boat', () => {
+    const gameBoard = GameBoard();
+    const boat = gameBoard.boats[0]; // carrier boat
+    const coordinates = { row: 0, col: 0 };
+
+    // Simulate placing a boat on the board
+    gameBoard.placeBoat(boat, coordinates, 'horizontal');
+    expect(gameBoard.getBoard()[0][0]).toBe(boat);
+    expect(gameBoard.getBoard()[0][1]).toBe(boat);
+    expect(gameBoard.getBoard()[0][2]).toBe(boat);
+    expect(gameBoard.getBoard()[0][3]).toBe(boat);
+    expect(gameBoard.getBoard()[0][4]).toBe(boat);
+  });
 });

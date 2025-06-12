@@ -41,10 +41,52 @@ function GameBoard(boardSize = 10) {
 
   // check if coordinates are available
   function isCoordinatesAvailable({ row, col }) {
+    // Check if the coordinates are within the board bounds
+    if (row < 0 || row >= boardSize || col < 0 || col >= boardSize) {
+      return false;
+    }
+    // Check if the cell is already occupied
     return board[row][col] === null;
   }
 
   // Place boats on the board randomly
+  function placeBoat(boat, { row, col }, direction) {
+    let canPlace = true;
+
+    // Check if the boat can be placed in the specified direction
+    for (let i = 0; i < boat.length; i++) {
+      // check if boat can be placed horizontally
+      if (direction === 'horizontal') {
+        if (
+          col + i >= boardSize ||
+          !isCoordinatesAvailable({ row, col: col + i })
+        ) {
+          canPlace = false;
+          break; // if the boat goes out of bounds or overlaps with another boat
+        }
+      }
+
+      // check if boat can be placed vertically
+      if (direction === 'vertical') {
+        if (
+          row + i >= boardSize ||
+          !isCoordinatesAvailable({ row: row + i, col })
+        ) {
+          canPlace = false;
+          break; // if the boat goes out of bounds or overlaps with another boat
+        }
+      }
+    }
+
+    // if the boat can be placed, place it on the board
+    if (canPlace) {
+      for (let i = 0; i < boat.length; i++) {
+        direction === 'horizontal'
+          ? (board[row][col + i] = boat)
+          : (board[row + i][col] = boat);
+      }
+    }
+  }
 
   function getBoard() {
     return board;
@@ -55,6 +97,7 @@ function GameBoard(boardSize = 10) {
     boats,
     getRandomCoordinates,
     isCoordinatesAvailable,
+    placeBoat,
   };
 }
 
