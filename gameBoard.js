@@ -85,19 +85,42 @@ function GameBoard(boardSize = 10) {
           ? (board[row][col + i] = boat)
           : (board[row + i][col] = boat);
       }
+      return true; // return true if the boat can be placed
     }
+
+    return false; // return false if the boat cannot be placed
+  }
+
+  // Place all boats at random positions on the board
+  function placeBoatsAtRandom() {
+    boats.forEach((boat) => {
+      let placed = false;
+      let attempts = 0; // limit to prevent infinite loops
+
+      while (!placed && attempts < 50) {
+        const coordinates = getRandomCoordinates();
+        const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+        if (placeBoat(boat, coordinates, direction)) {
+          placed = true;
+        }
+        attempts++; // failed to place the boat
+      }
+    });
   }
 
   function getBoard() {
     return board;
   }
 
+  function getBoats() {
+    return boats;
+  }
+
   return {
     getBoard,
-    boats,
-    getRandomCoordinates,
-    isCoordinatesAvailable,
+    getBoats,
     placeBoat,
+    placeBoatsAtRandom,
   };
 }
 
