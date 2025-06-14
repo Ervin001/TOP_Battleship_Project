@@ -1,7 +1,9 @@
+const { Ship } = require('./ship');
+
 function GameBoard(boardSize = 10) {
   const boats = [
     {
-      name: 'Carrier;',
+      name: 'Carrier',
       length: 5,
       direction: null,
     },
@@ -25,11 +27,14 @@ function GameBoard(boardSize = 10) {
       length: 2,
       direction: null,
     },
-  ];
+  ].map(({ name, length }) => Ship(name, length));
 
   // Initialize the game board with a 2D array
   const board = Array.from({ length: boardSize }, () =>
-    Array(boardSize).fill(null)
+    Array.from({ length: boardSize }, () => ({
+      boat: null,
+      hit: false,
+    }))
   );
 
   // Get random coordinates on the board
@@ -46,15 +51,15 @@ function GameBoard(boardSize = 10) {
       return false;
     }
     // Check if the cell is already occupied
-    return board[row][col] === null;
+    return board[row][col].boat === null;
   }
 
-  // Place boats on the board randomly
+  // Place boats on the board
   function placeBoat(boat, { row, col }, direction) {
     let canPlace = true;
 
     // Check if the boat can be placed in the specified direction
-    for (let i = 0; i < boat.length; i++) {
+    for (let i = 0; i < boat.shipLength; i++) {
       // check if boat can be placed horizontally
       if (direction === 'horizontal') {
         if (
@@ -80,10 +85,10 @@ function GameBoard(boardSize = 10) {
 
     // if the boat can be placed, place it on the board
     if (canPlace) {
-      for (let i = 0; i < boat.length; i++) {
+      for (let i = 0; i < boat.shipLength; i++) {
         direction === 'horizontal'
-          ? (board[row][col + i] = boat)
-          : (board[row + i][col] = boat);
+          ? (board[row][col + i].boat = boat)
+          : (board[row + i][col].boat = boat);
       }
       return true; // return true if the boat can be placed
     }
@@ -116,11 +121,51 @@ function GameBoard(boardSize = 10) {
     return boats;
   }
 
+  function receiveAttack({ row, col }) {
+    // Check if the coordinates are withing the board bounds
+    if (row < 0 || row >= boardSize || col < 0 || col >= boardSize) {
+      throw new Error('Coordinates are out of bounds');
+    }
+
+    // Check if the cell has already been hit
+    if (board[row][col].hit) {
+      throw new Error('Cell has already been hit');
+    }
+
+    // Mark the cell as hit
+    board[row][col].hit = true;
+
+    //check if there is a boat in the cell
+    if (board[row][col].boat) {
+      // If there is a boat, register a hit on the boat
+      board[row][col].boat.addHit();
+      return { hit: true, sunk: board[row][col].boat.isSunk() };
+    }
+
+    return { hit: false, sunk: false };
+  }
+
+  function allBoatsSunk() {
+    return boats.every((boat) => boat.isSunk()); // Check if all boats are sunk
+  }
+
+  function getRemainingBoats() {
+    return boats.filter((boat) => !boat.isSunk()).length; // Count boats that are not sunk
+  }
+
+  function getSunkenBoats() {
+    return boats.filter((boat) => boat.isSunk()).length; // Count boats that are sunk
+  }
+
   return {
     getBoard,
     getBoats,
     placeBoat,
     placeBoatsAtRandom,
+    receiveAttack,
+    allBoatsSunk,
+    getRemainingBoats,
+    getSunkenBoats,
   };
 }
 

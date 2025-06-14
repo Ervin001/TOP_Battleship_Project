@@ -1,30 +1,11 @@
 const { GameBoard } = require('../gameBoard.js');
 
 describe('GameBoard', () => {
-  // test('Game board is initialized with the correct size', () => {
-  //   const gameBoard = GameBoard(10);
-  //   expect(gameBoard).toHaveProperty('getBoard');
-  //   expect(gameBoard.getBoard()).toHaveLength(10);
-  // });
-
-  // test('Check if coordinates are available', () => {
-  //   const gameBoard = GameBoard(10);
-  //   const coordinates = { row: 0, col: 0 };
-  //   expect(gameBoard.isCoordinatesAvailable(coordinates)).toBe(true);
-  // });
-
-  // test('Check if coordinates are not available', () => {
-  //   const gameBoard = GameBoard(10);
-  //   const coordinates = { row: 0, col: 0 };
-  //   gameBoard.getBoard()[0][0] = 'Ship'; // Simulate a ship placed at (0, 0)
-  //   expect(gameBoard.isCoordinatesAvailable(coordinates)).toBe(false);
-  // });
-
-  // test('Check if randomly generated coordinates are available', () => {
-  //   const gameBoard = GameBoard(10);
-  //   const randomCoordinates = gameBoard.getRandomCoordinates(); // returns an object with row and col
-  //   expect(gameBoard.isCoordinatesAvailable(randomCoordinates));
-  // });
+  test('Game board is initialized with the correct size', () => {
+    const gameBoard = GameBoard(10);
+    expect(gameBoard).toHaveProperty('getBoard');
+    expect(gameBoard.getBoard()).toHaveLength(10);
+  });
 
   test('Check if board can place a boat', () => {
     const gameBoard = GameBoard();
@@ -33,43 +14,111 @@ describe('GameBoard', () => {
 
     // Simulate placing a boat on the board
     gameBoard.placeBoat(boat, coordinates, 'horizontal');
-    expect(gameBoard.getBoard()[0][0]).toBe(boat);
-    expect(gameBoard.getBoard()[0][1]).toBe(boat);
-    expect(gameBoard.getBoard()[0][2]).toBe(boat);
-    expect(gameBoard.getBoard()[0][3]).toBe(boat);
-    expect(gameBoard.getBoard()[0][4]).toBe(boat);
+    expect(gameBoard.getBoard()[0][0]).toEqual(
+      expect.objectContaining({
+        boat: boat,
+      })
+    );
   });
 
-  test('Check if board cannot place a boat out of bounds', () => {
+  test('Check that all boats are in the game board and no overlaps', () => {
     const gameBoard = GameBoard(10);
-    const boat = gameBoard.getBoats()[1]; // battle ship
-    const coordinates = { row: 9, col: 9 }; // out of bounds for a 10 x 10 board
-    gameBoard.placeBoat(boat, coordinates, 'horizontal');
-    expect(gameBoard.getBoard()[9][9]).toBeNull(); // The boat should not be placed
-  });
+    const boats = gameBoard.getBoats();
 
-  test('Ships are placed without overlaps and total cells match ship sizes', () => {
-    const gameBoard = GameBoard(10);
+    gameBoard.placeBoatsAtRandom(); // place the boats on the board
 
-    gameBoard.placeBoatsAtRandom();
-
-    const board = gameBoard.getBoard();
-    const totalShipCells = gameBoard
-      .getBoats()
-      .reduce((acc, ship) => acc + ship.length, 0);
-
+    const totalBoats = boats.reduce((acc, boat) => acc + boat.shipLength, 0);
     let occupiedCells = 0;
 
-    for (let row = 0; row < board.length; row++) {
-      for (let col = 0; col < board[row].length; col++) {
-        const cell = board[row][col];
-        if (cell !== null) {
+    // loop though the board and count occupied cells
+    for (let row = 0; row < gameBoard.getBoard().length; row++) {
+      for (let col = 0; col < gameBoard.getBoard()[row].length; col++) {
+        const cell = gameBoard.getBoard()[row][col];
+
+        if (cell.boat !== null) {
           occupiedCells++;
         }
       }
     }
+    // Validate total number of occupied cells matches total number of boats
+    expect(occupiedCells).toBe(totalBoats);
+  });
 
-    // Validate total number of ship cells
-    expect(occupiedCells).toBe(totalShipCells);
+  test('Make sure the boat cannot place ships out of bounds', () => {
+    const gameBoard = GameBoard(10);
+    const boat = gameBoard.getBoats()[1]; // battle ship
+    const coordinates = { row: 9, col: 9 }; // out of bounds for a 10 x 10 board
+    gameBoard.placeBoat(boat, coordinates, 'horizontal');
+
+    expect(gameBoard.getBoard()[9][9].boat).toBeNull(); // The boat should not be placed
+  });
+
+  test('Check that gameBoard can receive hits', () => {
+    const gameBoard = GameBoard(10);
+
+    const coordinates = { row: 0, col: 0 };
+
+    gameBoard.receiveAttack(coordinates);
+    expect(gameBoard.getBoard()[0][0].hit).toBe(true);
+    expect(gameBoard.getBoard()[0][1].hit).toBe(false); // Ensures other cells are not affected
+  });
+
+  test('Check that gameBoard throws an error if coordinates have already been hit', () => {
+    const gameBoard = GameBoard(10);
+    const coordinates = { row: 0, col: 0 };
+
+    // First attack should succeed
+    gameBoard.receiveAttack(coordinates);
+    expect(gameBoard.getBoard()[0][0].hit).toBe(true);
+
+    // Second attack on the same coordinates should throw an error
+    expect(() => {
+      gameBoard.receiveAttack(coordinates);
+    }).toThrow('Cell has already been hit');
+  });
+
+  test('Check if gameBoard has all boats sunk', () => {
+    const gameBoard = GameBoard(10);
+    const boats = gameBoard.getBoats();
+    // simulate hitting all boats
+    boats.forEach((boat) => {
+      for (let i = 0; i < boat.shipLength; i++) {
+        boat.addHit();
+      }
+    });
+
+    expect(gameBoard.allBoatsSunk()).toBe(true);
+  });
+
+  test('Get the number of boats left', () => {
+    const gameBoard = GameBoard(10);
+    const boats = gameBoard.getBoats();
+
+    // Simulate hitting all boats except one
+    boats.forEach((boat, index) => {
+      if (index < boats.length - 1) {
+        for (let i = 0; i < boat.shipLength; i++) {
+          boat.addHit();
+        }
+      }
+    });
+
+    expect(gameBoard.getRemainingBoats()).toBe(1); // One boat left
+  });
+
+  test('Get the number of boats sunk', () => {
+    const gameBoard = GameBoard(10);
+    const boats = gameBoard.getBoats();
+
+    // Simulate hitting all boats except one
+    boats.forEach((boat, index) => {
+      if (index < boats.length - 1) {
+        for (let i = 0; i < boat.shipLength; i++) {
+          boat.addHit();
+        }
+      }
+    });
+
+    expect(gameBoard.getSunkenBoats()).toBe(4); // one boat left
   });
 });

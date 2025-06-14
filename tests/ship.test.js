@@ -7,34 +7,38 @@ describe('Ship', () => {
   });
 
   test('Should return a Ship object with shipLength', () => {
-    expect(Ship(3)).toMatchObject({
+    expect(Ship('s', 3)).toMatchObject({
       shipLength: 3,
     });
   });
 
   test('Should show the numbers of hits', () => {
-    const ship = Ship(3);
+    const ship = Ship('s', 3);
     expect(ship.showHits()).toBe(0);
   });
 
   test('Should show if the ship is sunk', () => {
-    const ship = Ship(3);
+    const ship = Ship('s', 3);
+
     expect(ship.isSunk()).toBe(false);
   });
 
   test('Should update the hits when a hit is registered', () => {
-    const ship = Ship(3);
+    const ship = Ship('s', 3);
+
     ship.addHit();
     expect(ship.showHits()).toBe(1);
   });
 
   test('Ship should have a direction', () => {
-    const ship = Ship(3);
+    const ship = Ship('s', 3);
+
     expect(ship).toHaveProperty('getDirection');
   });
 
   test('Ship should be able to change direction', () => {
-    const ship = Ship(3);
+    const ship = Ship('s', 3);
+
     ship.changeDirection('vertical');
     expect(ship.getDirection()).toBe('vertical');
     ship.changeDirection('horizontal');

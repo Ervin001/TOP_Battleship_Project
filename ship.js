@@ -11,7 +11,7 @@
  * @returns
  */
 
-function Ship(shipLength) {
+function Ship(name, shipLength) {
   let hits = 0;
   let direction = 'horizontal'; // default direction
 
@@ -50,10 +50,12 @@ function Ship(shipLength) {
 
   return {
     shipLength,
+    name,
     showHits,
     isSunk,
     addHit,
     getDirection,
+
     changeDirection,
   };
 }
